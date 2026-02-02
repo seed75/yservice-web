@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import AppBackground from "@/components/AppBackground"; // ✅ 추가
+import AppBackground from "@/components/AppBackground";
+import AuthGate from "@/components/AuthGate";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,7 +28,9 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <AppBackground /> {/* ✅ 잔상 방지용 고정 배경 레이어 */}
-        {children}
+
+        {/* ✅ 여기만 추가: 로그인/권한 게이트 */}
+        <AuthGate>{children}</AuthGate>
       </body>
     </html>
   );
