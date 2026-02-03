@@ -27,9 +27,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        <AppBackground /> {/* ✅ 잔상 방지용 고정 배경 레이어 */}
+        <AppBackground /> {/* Fixed background layer to prevent ghosting */}
 
-        {/* ✅ 여기만 추가: 로그인/권한 게이트 */}
+        {/* Add here only: Login/Auth gate */}
         <AuthGate>{children}</AuthGate>
       </body>
     </html>

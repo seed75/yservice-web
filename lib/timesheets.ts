@@ -24,9 +24,9 @@ function minutesToHHMM(mins: number) {
   return `${h}:${String(m).padStart(2, "0")}`;
 }
 
-// ✅ 주간 상세 가져오기: (간단버전) 직접 쿼리로 구성
+// ✅ Fetch weekly details: simple version using direct queries
 export async function getWeekDetail(employeeId: string, weekStart: string): Promise<WeekDetail> {
-  // week_timesheet upsert 유도: day_shifts가 없을 수 있으니 week_timesheets 먼저 확보
+  // Ensure week_timesheets exist first because day_shifts may be missing
   await supabase.from("week_timesheets").upsert(
     { employee_id: employeeId, week_start_date: weekStart },
     { onConflict: "employee_id,week_start_date" }
@@ -52,7 +52,7 @@ export async function getWeekDetail(employeeId: string, weekStart: string): Prom
   const byDate = new Map<string, any>();
   (shifts ?? []).forEach((r) => byDate.set(r.work_date, r));
 
-  // 7일 채우기
+  // Fill 7 days
   const start = new Date(weekStart);
   const days: DayRow[] = [];
   for (let i = 0; i < 7; i++) {
@@ -81,7 +81,7 @@ export async function getWeekDetail(employeeId: string, weekStart: string): Prom
   };
 }
 
-// ✅ 하루 저장: RPC 호출(계산/검증/합계는 DB가 담당)
+// ✅ Save a day: call RPC (DB handles calculations/validation/totals)
 export async function saveDay(input: {
   employeeId: string;
   weekStart: string;

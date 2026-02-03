@@ -81,11 +81,11 @@ export async function getPayRunDetail(payRunId: string): Promise<PayRunDetail> {
       total_wage: r.total_wage ?? null,
       missing_days_count: r.missing_days_count ?? 0,
       created_at: r.created_at,
-      employee_name: r.employees?.name ?? "(이름없음)",
+      employee_name: r.employees?.name ?? "(No name)",
       employee_hourly_wage: r.employees?.hourly_wage ?? null,
     })) ?? [];
 
-  // 사장 UX: 미완료가 위로 오게 정렬
+  // Owner UX: sort so incomplete items appear first
   mapped.sort((a, b) => {
     const aKey = a.missing_days_count > 0 ? 0 : 1;
     const bKey = b.missing_days_count > 0 ? 0 : 1;
@@ -119,7 +119,7 @@ export async function isDateRangePaid(employeeId: string, startDate: string, end
   return runs.some((r: any) => {
     const ps = new Date(r.period_start);
     const pe = new Date(r.period_end);
-    return ps <= e && pe >= s; // 기간 겹치면 잠금
+    return ps <= e && pe >= s; // Lock if periods overlap
   });
 }
 
@@ -127,7 +127,7 @@ export async function undoPayRunPaid(payRunId: string) {
   const { error } = await supabase
     .from("pay_runs")
     .update({
-      status: "open",     // ✅ 여기만 변경 (draft -> open)
+      status: "open",     // ✅ Change here only (draft -> open)
       paid_at: null,
       updated_at: new Date().toISOString(),
     })

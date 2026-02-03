@@ -10,14 +10,14 @@ export default function Home() {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // 추가 폼
+  // Add form
   const [name, setName] = useState("");
   const [wage, setWage] = useState<string>("");
 
-  // 드롭다운 이동
+  // Dropdown navigation
   const [selectedId, setSelectedId] = useState<string>("");
 
-  // 인라인 편집 상태
+  // Inline edit state
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
   const [editWage, setEditWage] = useState<string>("");
@@ -51,7 +51,7 @@ export default function Home() {
   async function onAdd() {
     const trimmed = name.trim();
     if (!trimmed) {
-      alert("직원 이름을 입력하세요.");
+      alert("Please enter the employee's name.");
       return;
     }
 
@@ -65,13 +65,13 @@ export default function Home() {
       await refresh(false);
       setSelectedId(created.id);
     } catch (e: any) {
-      alert(e?.message ?? "직원 추가 실패");
+      alert(e?.message ?? "Failed to add employee");
     }
   }
 
   function goSelected() {
     if (!selectedId) {
-      alert("직원을 선택하세요.");
+      alert("Please select an employee.");
       return;
     }
     window.location.href = `/employees/${selectedId}`;
@@ -92,17 +92,17 @@ export default function Home() {
   async function saveEdit(empId: string) {
     const trimmed = editName.trim();
     if (!trimmed) {
-      alert("직원 이름은 비울 수 없습니다.");
+      alert("Employee name cannot be empty.");
       return;
     }
 
     const wageValue = editWage.trim() ? Number(editWage) : null;
     if (editWage.trim() && Number.isNaN(wageValue)) {
-      alert("시급은 숫자만 입력하세요.");
+      alert("Please enter numbers only for hourly wage.");
       return;
     }
     if (wageValue != null && wageValue < 0) {
-      alert("시급은 0 이상이어야 합니다.");
+      alert("Hourly wage must be 0 or greater.");
       return;
     }
 
@@ -111,12 +111,12 @@ export default function Home() {
       await refresh();
       cancelEdit();
     } catch (e: any) {
-      alert(e?.message ?? "수정 실패");
+      alert(e?.message ?? "Edit failed");
     }
   }
 
   async function onDelete(emp: Employee) {
-    const ok = window.confirm(`${emp.name} 직원을 삭제할까요?\n\n주의: 이 직원의 주간 기록도 함께 삭제됩니다.`);
+    const ok = window.confirm(`${emp.name} Delete this employee?\n\nWarning: This employee's weekly records will also be deleted.`);
     if (!ok) return;
 
     try {
@@ -124,7 +124,7 @@ export default function Home() {
       await refresh();
       if (editingId === emp.id) cancelEdit();
     } catch (e: any) {
-      alert(e?.message ?? "삭제 실패");
+      alert(e?.message ?? "Failed to delete");
     }
   }
 
@@ -160,18 +160,18 @@ export default function Home() {
   return (
     <PageShell>
       <main style={{ maxWidth: 760 }}>
-        {/* 상단 헤더 라인: 타이틀 + 로그아웃 */}
+        {/* Top header line: title + logout */}
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12 }}>
           <div>
-            <h1 style={{ fontSize: 20, fontWeight: 800, color: "var(--text)" }}>직원 관리</h1>
+            <h1 style={{ fontSize: 20, fontWeight: 800, color: "var(--text)" }}>Employees</h1>
             <p style={{ marginTop: 6, color: "var(--muted)", fontSize: 14 }}>
-              직원 추가/수정/삭제는 여기서 바로 처리합니다.
+              Add/edit/delete employees here.
             </p>
           </div>
           <LogoutButton />
         </div>
 
-        {/* 액션 바: PayRun + 드롭다운 + 이동 */}
+        {/* Action bar: PayRun + dropdown + navigation */}
         <div
           style={{
             marginTop: 16,
@@ -185,7 +185,7 @@ export default function Home() {
             onClick={() => (window.location.href = "/payruns")}
             style={btnGhost}
           >
-            2주 정산 (Pay Run)
+            Biweekly Pay Run
           </button>
 
           <select
@@ -195,7 +195,7 @@ export default function Home() {
             disabled={loading || employees.length === 0}
           >
             {employees.length === 0 ? (
-              <option value="">직원이 없습니다</option>
+              <option value="">No employees</option>
             ) : (
               employees.map((e) => (
                 <option key={e.id} value={e.id}>
@@ -206,11 +206,11 @@ export default function Home() {
           </select>
 
           <button onClick={goSelected} style={btnPrimary} disabled={!selectedId}>
-            주간 입력으로 이동
+            Go to weekly timesheet
           </button>
         </div>
 
-        {/* 추가 폼 */}
+        {/* Add form */}
         <div
           style={{
             marginTop: 12,
@@ -223,27 +223,27 @@ export default function Home() {
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="직원 이름"
+            placeholder="Employee name"
             style={inputStyle}
           />
           <input
             value={wage}
             onChange={(e) => setWage(e.target.value)}
-            placeholder="시급(선택)"
+            placeholder="Hourly wage (optional)"
             inputMode="numeric"
             style={inputStyle}
           />
           <button onClick={onAdd} style={btnPrimary}>
-            추가
+            Add
           </button>
         </div>
 
-        {/* 직원 목록 */}
+        {/* Employee list */}
         <div style={{ marginTop: 18 }}>
           {loading ? (
-            <div style={{ color: "var(--muted)" }}>불러오는 중...</div>
+            <div style={{ color: "var(--muted)" }}>Loading...</div>
           ) : employees.length === 0 ? (
-            <div style={{ color: "var(--muted)" }}>직원이 없습니다. 위에서 추가해보세요.</div>
+            <div style={{ color: "var(--muted)" }}>No employees. Add one above.</div>
           ) : (
             <div style={{ marginTop: 8 }}>
               {employees.map((e) => {
@@ -281,15 +281,15 @@ export default function Home() {
                           value={editWage}
                           onChange={(ev) => setEditWage(ev.target.value)}
                           inputMode="numeric"
-                          placeholder="시급(선택)"
+                          placeholder="Hourly wage (optional)"
                           style={{ ...inputStyle, width: "100%", padding: 10 }}
                         />
                       ) : e.hourly_wage != null ? (
                         <span style={{ color: "var(--muted)", fontSize: 14 }}>
-                          시급 <b style={{ color: "var(--text)" }}>{e.hourly_wage.toLocaleString()}</b>불
+                          Hourly <b style={{ color: "var(--text)" }}>{e.hourly_wage.toLocaleString()}</b>$
                         </span>
                       ) : (
-                        <span style={{ color: "rgba(71,85,105,0.7)", fontSize: 14 }}>시급 없음</span>
+                        <span style={{ color: "rgba(71,85,105,0.7)", fontSize: 14 }}>No wage</span>
                       )}
                     </div>
 
@@ -297,16 +297,16 @@ export default function Home() {
                       {isEditing ? (
                         <>
                           <button onClick={() => saveEdit(e.id)} style={btnPrimary}>
-                            저장
+                            Save
                           </button>
                           <button onClick={cancelEdit} style={btnGhost}>
-                            취소
+                            Cancel
                           </button>
                         </>
                       ) : (
                         <>
                           <button onClick={() => startEdit(e)} style={btnGhost}>
-                            수정
+                            Edit
                           </button>
                           <button
                             onClick={() => onDelete(e)}
@@ -317,7 +317,7 @@ export default function Home() {
                               color: "#991b1b",
                             }}
                           >
-                            삭제
+                            Delete
                           </button>
                         </>
                       )}
@@ -329,7 +329,7 @@ export default function Home() {
           )}
         </div>
 
-        {/* 작은 화면 대응: grid 깨지면 세로로 */}
+        {/* Small screen: stack vertically if grid breaks */}
         <style jsx>{`
           @media (max-width: 640px) {
             main {

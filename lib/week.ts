@@ -8,7 +8,7 @@ export function toISODate(d: Date) {
 export function startOfWeekMonday(date = new Date()) {
   const d = new Date(date);
   const day = d.getDay(); // 0=Sun,1=Mon...
-  const diff = day === 0 ? -6 : 1 - day; // 월요일 기준
+  const diff = day === 0 ? -6 : 1 - day; // Week starts on Monday
   d.setDate(d.getDate() + diff);
   d.setHours(0, 0, 0, 0);
   return d;

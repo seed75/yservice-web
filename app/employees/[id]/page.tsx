@@ -15,7 +15,7 @@ import { normalizeTimeInput, relaxEndTime, toHHMM } from "@/lib/timeInput";
 import PageShell from "@/components/PageShell";
 import { isDateRangePaid } from "@/lib/payruns";
 
-const DOW = ["월", "화", "수", "목", "금", "토", "일"];
+const DOW = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 type SaveState = "idle" | "saving" | "saved" | "error";
 
 export default function EmployeeWeekPage() {
@@ -51,22 +51,22 @@ export default function EmployeeWeekPage() {
       setDetail(d);
       setSaveStateByDate({});
     } catch (e: any) {
-      // ✅ 최소한의 에러 표시 (멈춘 것처럼 보이지 않게)
-      showToast(e?.message ?? "주간 데이터 로드 실패");
+      // ✅ Minimal error display (so it doesn't look frozen)
+      showToast(e?.message ?? "Failed to load weekly data");
       setDetail(null);
     } finally {
       setLoading(false);
     }
   }
 
-  // ✅ (핵심) 페이지 진입/주 변경 시 실제로 데이터를 불러오는 트리거
+  // ✅ (Core) Trigger to load data on page entry/week change
   useEffect(() => {
     if (!employeeId) return;
     refresh();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [employeeId, weekStart]);
 
-  // ✅ Paid 잠금 체크 (데이터 로딩과는 분리)
+  // ✅ Paid lock check (separate from data loading)
   useEffect(() => {
     (async () => {
       try {
@@ -117,9 +117,9 @@ export default function EmployeeWeekPage() {
       });
 
       setSaveState(row.date, "saved");
-      showToast("저장됨");
+      showToast("Saved");
 
-      // ✅ 저장 후 totals/workMinutes만 조용히 갱신
+      // ✅ After save, quietly refresh only totals/workMinutes
       if (refreshTimerRef.current) clearTimeout(refreshTimerRef.current);
       refreshTimerRef.current = window.setTimeout(async () => {
         try {
@@ -131,7 +131,7 @@ export default function EmployeeWeekPage() {
       }, 400);
     } catch (e: any) {
       setSaveState(row.date, "error");
-      showToast(e?.message ?? "저장 실패");
+      showToast(e?.message ?? "Save failed");
     }
   }
 
@@ -159,10 +159,10 @@ export default function EmployeeWeekPage() {
 
   function renderRight(row: DayRow) {
     const st = saveStateByDate[row.date];
-    if (st === "saving") return "저장중…";
-    if (st === "saved") return "저장됨";
-    if (st === "error") return "오류";
-    return row.isComplete ? `시간 ${formatWorkMinutes(row.workMinutes)}` : "미완료";
+    if (st === "saving") return "Saving…";
+    if (st === "saved") return "Saved";
+    if (st === "error") return "Error";
+    return row.isComplete ? `Time ${formatWorkMinutes(row.workMinutes)}` : "Incomplete";
   }
 
   return (
@@ -175,7 +175,7 @@ export default function EmployeeWeekPage() {
         )}
 
         <a href="/" className="underline text-sm">
-          ← 직원 목록
+          ← Employees
         </a>
 
         <div className="mt-4 flex items-center justify-center gap-3">
@@ -185,11 +185,11 @@ export default function EmployeeWeekPage() {
         </div>
 
         {loading || !detail ? (
-          <div className="mt-6">불러오는 중…</div>
+          <div className="mt-6">Loading…</div>
         ) : (
           <>
             <div className="mt-4 text-sm opacity-70">
-              상태 <b>{detail.status}</b> · 미완료 <b>{detail.missingDaysCount}</b>일
+              Status <b>{detail.status}</b> · Incomplete <b>{detail.missingDaysCount}</b> days
             </div>
 
             {isPaidLocked ? (
@@ -203,7 +203,7 @@ export default function EmployeeWeekPage() {
                   fontSize: 14,
                 }}
               >
-                이 주는 <b>지급 완료(Paid)</b> 처리되어 수정할 수 없습니다.
+                This week is marked <b>Paid</b> and cannot be edited.
               </div>
             ) : null}
 
@@ -218,7 +218,7 @@ export default function EmployeeWeekPage() {
                     <input
                       value={toHHMM(row.startTime)}
                       onChange={(e) => updateRow(idx, { startTime: e.target.value || null })}
-                      placeholder="출근"
+                      placeholder="Clock in"
                       disabled={isPaidLocked}
                       className="rounded-lg border px-3 py-2 text-sm disabled:opacity-50"
                     />
@@ -231,7 +231,7 @@ export default function EmployeeWeekPage() {
                       }}
                       onBlur={() => flushEndSave(idx)}
                       onKeyDown={(e) => e.key === "Enter" && flushEndSave(idx)}
-                      placeholder="퇴근"
+                      placeholder="Clock out"
                       disabled={isPaidLocked}
                       className="rounded-lg border px-3 py-2 text-sm disabled:opacity-50"
                     />
@@ -245,10 +245,10 @@ export default function EmployeeWeekPage() {
             </div>
 
             <div className="mt-6 text-sm font-medium">
-              주간 총 근무 <b>{formatTotalMinutes(detail.totals.totalMinutes)}</b>
+              Weekly total <b>{formatTotalMinutes(detail.totals.totalMinutes)}</b>
               {detail.totals.totalWage != null && (
                 <span className="ml-3">
-                  예상 주급 <b>{detail.totals.totalWage.toLocaleString()}불</b>
+                  Estimated weekly wage <b>${detail.totals.totalWage.toLocaleString()}</b>
                 </span>
               )}
             </div>

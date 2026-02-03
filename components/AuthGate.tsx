@@ -12,7 +12,7 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
   const [checking, setChecking] = useState(true);
   const [allowed, setAllowed] = useState(false);
 
-  // ✅ 로그인/콜백 페이지는 게이트 통과 (여기 없으면 /login이 흰 화면 됨)
+  // ✅ Allow login/callback pages through the gate (without this, /login goes blank)
   const isPublicRoute = useMemo(() => {
     if (!pathname) return false;
     return pathname === "/login" || pathname.startsWith("/auth");
@@ -22,7 +22,7 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
     let alive = true;
 
     async function run() {
-      // /login 자체는 그냥 보여줘야 함
+      // /login itself should just be shown
       if (isPublicRoute) {
         if (!alive) return;
         setAllowed(true);
@@ -45,7 +45,7 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
 
       const email = (user.email ?? "").toLowerCase();
       if (email !== ALLOWED_EMAIL.toLowerCase()) {
-        // 허용 이메일이 아니면 로그아웃시키고 로그인으로 보냄
+        // If not an allowed email, sign out and redirect to login
         await supabase.auth.signOut();
         setAllowed(false);
         setChecking(false);
@@ -64,16 +64,16 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
   }, [isPublicRoute, router]);
 
   if (checking) {
-    // 흰 화면 대신 "체크중" 화면
+    // Show 'checking' screen instead of blank
     return (
       <div style={{ padding: 24, textAlign: "center" }}>
-        인증 확인 중...
+        Checking authentication...
       </div>
     );
   }
 
   if (!allowed) {
-    // redirect 중이라 UI는 최소화
+    // Minimize UI during redirect
     return null;
   }
 

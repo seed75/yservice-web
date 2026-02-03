@@ -37,11 +37,11 @@ export default function PageShell({
             className="mx-auto mt-4 max-w-2xl text-base sm:text-lg"
             style={{ color: "var(--muted)" }}
           >
-            출근·퇴근만 입력하면 자동 계산됩니다.
+            Only enter clock-in and clock-out times; calculations are automatic.
           </p>
         </div>
 
-        {/* 👇 여기 안에 실제 페이지 내용이 들어감 */}
+        {/* 👇 Actual page content goes here */}
         <div
           className="mx-auto mt-10 max-w-3xl rounded-3xl border p-4 shadow-sm sm:p-6"
           style={{

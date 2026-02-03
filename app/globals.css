@@ -16,6 +16,6 @@
 
 html, body {
   min-height: 100%;
-  background: transparent; /* ✅ 배경은 AppBackground가 담당 */
+  background: transparent; /* ✅ Background is handled by AppBackground */
   color: var(--text);
 }

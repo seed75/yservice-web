@@ -2,7 +2,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 
-const ALLOWED_EMAIL = "blessedrootsau@gmail.com"; // ✅ 허용할 이메일 1개 고정
+const ALLOWED_EMAIL = "blessedrootsau@gmail.com"; // ✅ Single allowed email (fixed)
 
 export async function proxy(req: NextRequest) {
   const res = NextResponse.next();
@@ -30,14 +30,14 @@ export async function proxy(req: NextRequest) {
   const pathname = req.nextUrl.pathname;
   const isLoginPage = pathname.startsWith("/login");
 
-  // ✅ 1) 로그인 안했는데 login 페이지가 아니면 -> login으로
+  // ✅ 1) If not logged in and not on the login page -> redirect to /login
   if (!user && !isLoginPage) {
     const url = req.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);
   }
 
-  // ✅ 2) 로그인 했는데 허용 이메일 아니면 -> login으로 (차단)
+  // ✅ 2) If logged in but not an allowed email -> redirect to /login (blocked)
   if (user && user.email?.toLowerCase() !== ALLOWED_EMAIL.toLowerCase()) {
     const url = req.nextUrl.clone();
     url.pathname = "/login";
@@ -45,7 +45,7 @@ export async function proxy(req: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // ✅ 3) 로그인했는데 login 페이지면 -> 홈으로
+  // ✅ 3) If logged in and on the login page -> redirect to home
   if (user && isLoginPage) {
     const url = req.nextUrl.clone();
     url.pathname = "/";

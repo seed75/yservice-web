@@ -30,7 +30,7 @@ export function toHHMM(t: string | null) {
   return t.slice(0, 5); // "11:00:00" -> "11:00"
 }
 
-// ✅ 유도리: 퇴근이 출근보다 작으면 +12시간 시도(오후로 해석)
+// ✅ Grace: if end time < start time, try +12 hours (interpret as PM)
 export function relaxEndTime(startHHMM: string | null, endHHMM: string | null): string | null {
   if (!startHHMM || !endHHMM) return endHHMM;
 
@@ -49,6 +49,6 @@ export function relaxEndTime(startHHMM: string | null, endHHMM: string | null): 
     return `${pad2(h)}:${pad2(m)}`;
   }
 
-  // 그래도 작으면(야간근무 등) 일단 그대로 반환 → RPC에서 막힐 수 있음
+  // If still smaller (e.g., night shift), return as-is — RPC may reject it
   return endHHMM;
 }

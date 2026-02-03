@@ -38,7 +38,7 @@ export async function createEmployee(input: {
   return data;
 }
 
-// ✅ U: 직원 수정 (이름/시급/메모)
+// ✅ U: Update employee (name/hourly rate/notes)
 export async function updateEmployee(
   employeeId: string,
   patch: { name?: string; hourly_wage?: number | null; memo?: string | null }
@@ -59,7 +59,7 @@ export async function updateEmployee(
   return data;
 }
 
-// ✅ D: 직원 삭제 (연관 주간/일자도 FK로 같이 삭제됨: on delete cascade)
+// ✅ D: Delete employee (related weekly/daily entries deleted via FK: on delete cascade)
 export async function deleteEmployee(employeeId: string) {
   const { error } = await supabase.from("employees").delete().eq("id", employeeId);
   if (error) throw error;

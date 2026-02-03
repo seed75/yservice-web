@@ -30,7 +30,7 @@ export default function LogoutButton() {
         color: "var(--text)",
       }}
     >
-      {loading ? "로그아웃..." : "로그아웃"}
+      {loading ? "Logging out..." : "Log out"}
     </button>
   );
 }

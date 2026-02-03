@@ -7,7 +7,7 @@ import {
   buildPayRun,
   getPayRunDetail,
   markPayRunPaid,
-  undoPayRunPaid, // ✅ 추가
+  undoPayRunPaid, // ✅ added
   type PayRunDetail,
 } from "@/lib/payruns";
 import { formatTotalMinutes } from "@/lib/timesheets";
@@ -38,7 +38,7 @@ export default function PayRunsPage() {
   }
 
   const title = useMemo(
-    () => `${periodStart} ~ ${periodEnd} (2주 정산)`,
+    () => `${periodStart} ~ ${periodEnd} (Biweekly Pay Run)`,
     [periodStart, periodEnd]
   );
 
@@ -50,7 +50,7 @@ export default function PayRunsPage() {
       const d = await getPayRunDetail(payRunId);
       setDetail(d);
     } catch (e: any) {
-      const msg = e?.message ?? "Pay Run 로드 실패";
+      const msg = e?.message ?? "Failed to load Pay Run";
       setError(msg);
       setDetail(null);
       showToast(msg);
@@ -92,35 +92,35 @@ export default function PayRunsPage() {
     if (detail.payRun.status === "paid") return;
 
     const ok = window.confirm(
-      "이 2주 정산을 '지급 완료(Paid)'로 처리할까요?\n\nPaid 처리 후에는 수정이 어려워집니다."
+      "Mark this biweekly pay run as 'Paid'?\n\nAfter marking as Paid, edits will be difficult."
     );
     if (!ok) return;
 
     try {
       await markPayRunPaid(detail.payRun.id);
-      showToast("지급 완료 처리됨");
+      showToast("Marked as Paid");
       await load();
     } catch (e: any) {
-      showToast(e?.message ?? "Paid 처리 실패");
+      showToast(e?.message ?? "Failed to mark as Paid");
     }
   }
 
-  // ✅ 추가: Undo Paid
+  // ✅ Added: Undo Paid
   async function onUndoPaid() {
     if (!detail) return;
     if (detail.payRun.status !== "paid") return;
 
     const ok = window.confirm(
-      "지급 완료(Paid)를 취소할까요?\n\n⚠️ 이 기간의 근무 기록이 다시 수정 가능해집니다."
+      "Undo Paid for this pay run?\n\n⚠️ Records in this period will become editable again."
     );
     if (!ok) return;
 
     try {
       await undoPayRunPaid(detail.payRun.id);
-      showToast("Paid 취소됨 (Draft로 변경)");
+      showToast("Paid undone (set to Draft)");
       await load();
     } catch (e: any) {
-      showToast(e?.message ?? "Undo 실패");
+      showToast(e?.message ?? "Undo failed");
     }
   }
 
@@ -149,13 +149,13 @@ export default function PayRunsPage() {
 
         <div className="flex items-center justify-between gap-3">
           <Link href="/" className="underline text-sm">
-            ← 홈
+            ← Home
           </Link>
 
           <div className="text-sm opacity-70">
             {detail ? (
               <>
-                상태: <b>{detail.payRun.status}</b>
+                Status: <b>{detail.payRun.status}</b>
                 {detail.payRun.paid_at ? (
                   <span>
                     {" "}
@@ -187,7 +187,7 @@ export default function PayRunsPage() {
         </div>
 
         {loading ? (
-          <div className="mt-6">불러오는 중…</div>
+          <div className="mt-6">Loading…</div>
         ) : error ? (
           <div
             className="mt-6 rounded-2xl border p-4"
@@ -197,7 +197,7 @@ export default function PayRunsPage() {
             }}
           >
             <div style={{ color: "var(--text)", fontWeight: 700 }}>
-              Pay Run을 불러오지 못했습니다
+              Unable to load Pay Run
             </div>
             <div className="mt-2 text-sm" style={{ color: "var(--muted)" }}>
               {error}
@@ -207,11 +207,11 @@ export default function PayRunsPage() {
               className="mt-3 rounded-full px-4 py-2 text-sm font-medium"
               style={{ background: "var(--cta)", color: "white" }}
             >
-              다시 시도
+              Retry
             </button>
           </div>
         ) : !detail ? (
-          <div className="mt-6">데이터가 없습니다.</div>
+          <div className="mt-6">No data available.</div>
         ) : (
           <>
             <div
@@ -222,17 +222,17 @@ export default function PayRunsPage() {
               }}
             >
               <div className="text-sm opacity-80">
-                전체 합계: <b>{formatTotalMinutes(totals.minutes)}</b>
+                Totals: <b>{formatTotalMinutes(totals.minutes)}</b>
                 {totals.wageKnown ? (
                   <span className="ml-3">
-                    예상 지급총액: <b>{moneyAUD(totals.wage)}</b>
+                    Estimated total payout: <b>{moneyAUD(totals.wage)}</b>
                   </span>
                 ) : (
-                  <span className="ml-3">(시급 없는 직원 포함)</span>
+                  <span className="ml-3">(includes employees without wage)</span>
                 )}
                 {totals.missingEmployees > 0 ? (
                   <span className="ml-3">
-                    · 미완료 직원 <b>{totals.missingEmployees}</b>명
+                    · <b>{totals.missingEmployees}</b> incomplete employees
                   </span>
                 ) : null}
               </div>
@@ -246,7 +246,7 @@ export default function PayRunsPage() {
                     border: `1px solid var(--card-border)`,
                   }}
                 >
-                  새로고침
+                  Refresh
                 </button>
 
                 <button
@@ -255,10 +255,10 @@ export default function PayRunsPage() {
                   className="rounded-full px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
                   style={{ background: "var(--cta)" }}
                 >
-                  지급 완료(Paid)
+                  Mark as Paid
                 </button>
 
-                {/* ✅ 추가: paid일 때 Undo 버튼 */}
+                {/* ✅ Added: Undo button when paid */}
                 <button
                   onClick={onUndoPaid}
                   disabled={detail.payRun.status !== "paid"}
@@ -269,7 +269,7 @@ export default function PayRunsPage() {
                     color: "#dc2626",
                   }}
                 >
-                  Paid 취소(Undo)
+                  Undo Paid
                 </button>
               </div>
             </div>
@@ -295,10 +295,10 @@ export default function PayRunsPage() {
                           {it.employee_name}
                         </div>
                         <div className="mt-1 text-xs opacity-70">
-                          시급:{" "}
+                          Hourly: {" "}
                           {it.employee_hourly_wage != null
                             ? moneyAUD(it.employee_hourly_wage)
-                            : "없음"}
+                            : "None"}
                         </div>
                       </div>
 
@@ -312,7 +312,7 @@ export default function PayRunsPage() {
                               background: "rgba(245,158,11,0.12)",
                             }}
                           >
-                            미완료 {it.missing_days_count}일
+                            Incomplete {it.missing_days_count} days
                           </span>
                         ) : (
                           <span
@@ -323,20 +323,20 @@ export default function PayRunsPage() {
                               background: "rgba(16,185,129,0.12)",
                             }}
                           >
-                            완료
+                            Complete
                           </span>
                         )}
                       </div>
                     </div>
 
                     <div className="mt-3 text-sm">
-                      시간: <b>{formatTotalMinutes(it.total_minutes)}</b>
+                      Time: <b>{formatTotalMinutes(it.total_minutes)}</b>
                       <span className="ml-3">
-                        금액:{" "}
+                        Amount: {" "}
                         <b>
                           {it.total_wage != null
                             ? moneyAUD(Number(it.total_wage))
-                            : "시급 없음"}
+                            : "No wage"}
                         </b>
                       </span>
                     </div>
@@ -346,7 +346,7 @@ export default function PayRunsPage() {
                         href={`/employees/${it.employee_id}`}
                         className="underline text-sm"
                       >
-                        이 직원 주간 입력 보기 →
+                        View this employee's weekly timesheet →
                       </Link>
                     </div>
                   </div>

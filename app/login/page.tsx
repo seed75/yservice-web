@@ -15,17 +15,17 @@ export default function LoginPage() {
     setLoading(true);
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
-        email: email.trim().toLowerCase(), // ✅ 추천(대소문자 방지)
+        email: email.trim().toLowerCase(), // ✅ recommended (avoid case sensitivity)
         password: pw,
       });
       if (error) throw error;
 
-      if (!data.session) throw new Error("로그인 세션을 만들지 못했습니다.");
+      if (!data.session) throw new Error("Failed to create login session");
 
       router.replace("/");
-      router.refresh(); // 핵심: 성공했는데 화면이 그대로인 문제 방지
+      router.refresh(); // Important: refresh to avoid screen staying the same after successful login
     } catch (e: any) {
-      alert(e?.message ?? "로그인 실패");
+      alert(e?.message ?? "Login failed");
     } finally {
       setLoading(false);
     }
@@ -35,7 +35,7 @@ export default function LoginPage() {
     <main style={{ maxWidth: 420, margin: "80px auto", padding: 20 }}>
       <h1 style={{ fontSize: 22, fontWeight: 800 }}>Admin Login</h1>
       <p style={{ opacity: 0.7, marginTop: 6 }}>
-        Owner 계정만 접근 가능합니다.
+        Only the Owner account can access this.
       </p>
 
       <div style={{ marginTop: 18, display: "grid", gap: 10 }}>
@@ -67,7 +67,7 @@ export default function LoginPage() {
             opacity: loading ? 0.6 : 1,
           }}
         >
-          {loading ? "로그인 중..." : "로그인"}
+          {loading ? "Logging in..." : "Log in"}
         </button>
       </div>
     </main>
