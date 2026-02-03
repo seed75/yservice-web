@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Simple Weekly Timesheets",
-  description: "Owner-only timesheet",
+  description: "Employee timesheet",
 };
 
 export default function RootLayout({

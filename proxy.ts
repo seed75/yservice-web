@@ -2,7 +2,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 
-const ALLOWED_EMAIL = "blessedrootsau@gmail.com"; // ✅ Single allowed email (fixed)
 
 export async function proxy(req: NextRequest) {
   const res = NextResponse.next();
@@ -37,13 +36,7 @@ export async function proxy(req: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // ✅ 2) If logged in but not an allowed email -> redirect to /login (blocked)
-  if (user && user.email?.toLowerCase() !== ALLOWED_EMAIL.toLowerCase()) {
-    const url = req.nextUrl.clone();
-    url.pathname = "/login";
-    url.searchParams.set("reason", "not_allowed");
-    return NextResponse.redirect(url);
-  }
+  // No single-email restriction: any authenticated user is allowed to access the app
 
   // ✅ 3) If logged in and on the login page -> redirect to home
   if (user && isLoginPage) {

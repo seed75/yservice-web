@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 
-const ALLOWED_EMAIL = "blessedrootsau@gmail.com";
 
 export default function AuthGate({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -43,18 +42,13 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      const email = (user.email ?? "").toLowerCase();
-      if (email !== ALLOWED_EMAIL.toLowerCase()) {
-        // If not an allowed email, sign out and redirect to login
-        await supabase.auth.signOut();
-        setAllowed(false);
-        setChecking(false);
-        router.replace("/login");
-        return;
-      }
-
+      // No email-based restriction: allow any authenticated user
       setAllowed(true);
       setChecking(false);
+      return; // proceed to render app
+      
+      // (previously enforced a single allowed email; removed to allow public sign-ups)
+
     }
 
     run();

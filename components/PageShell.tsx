@@ -26,7 +26,7 @@ export default function PageShell({
               className="h-2 w-2 rounded-full"
               style={{ background: "var(--cta)" }}
             />
-            Owner-only Timesheet
+            Timesheets
           </div>
 
           <h1 className="mt-6 text-4xl font-semibold tracking-tight text-[var(--text)] sm:text-6xl">
