@@ -5,6 +5,9 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 
+const GUEST_EMAIL = process.env.NEXT_PUBLIC_GUEST_EMAIL ?? "";
+const GUEST_PASSWORD = process.env.NEXT_PUBLIC_GUEST_PASSWORD ?? "";
+
 export default function LoginPage() {
   const router = useRouter();
   const [mode, setMode] = useState<"login" | "signup">("login");
@@ -30,6 +33,29 @@ export default function LoginPage() {
       router.refresh(); // refresh to update UI after login
     } catch (e: any) {
       setMsg(e?.message ?? "Login failed");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function onGuestLogin() {
+    if (!GUEST_EMAIL || !GUEST_PASSWORD) {
+      setMsg("Guest access is not configured.");
+      return;
+    }
+    setMsg(null);
+    setLoading(true);
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: GUEST_EMAIL,
+        password: GUEST_PASSWORD,
+      });
+      if (error) throw error;
+      if (!data.session) throw new Error("Failed to create guest session");
+      router.replace("/");
+      router.refresh();
+    } catch (e: any) {
+      setMsg(e?.message ?? "Guest login failed");
     } finally {
       setLoading(false);
     }
@@ -148,6 +174,33 @@ export default function LoginPage() {
             </>
           )}
         </div>
+
+        {GUEST_EMAIL && (
+          <>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 16 }}>
+              <div style={{ flex: 1, height: 1, background: "#e4e4e7" }} />
+              <span style={{ fontSize: 13, color: "#a1a1aa" }}>or</span>
+              <div style={{ flex: 1, height: 1, background: "#e4e4e7" }} />
+            </div>
+            <button
+              onClick={onGuestLogin}
+              disabled={loading}
+              style={{
+                marginTop: 12,
+                padding: "10px 14px",
+                borderRadius: 999,
+                border: "1px solid #e4e4e7",
+                background: "transparent",
+                color: "#52525b",
+                fontWeight: 600,
+                opacity: loading ? 0.6 : 1,
+                width: "100%",
+              }}
+            >
+              {loading ? "Signing in..." : "Continue as Guest"}
+            </button>
+          </>
+        )}
       </div>
     </main>
   );
